@@ -13,6 +13,7 @@
 #include <vector>
 #include <variant>
 #include <iostream>
+#include <sstream>
 #include <cassert>
 #include <list>
 #include <unordered_map>

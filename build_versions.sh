@@ -4,21 +4,23 @@
 mkdir -p compaction
 mkdir -p filter_and_join
 
-# Dictionary of all compaction options
-declare -A compaction_options=(
-    ["logical"]="USE_NO_COMPACT"
-    ["smart"]="USE_DYNAMIC_COMPACT")
+# Compaction options as parallel arrays (for compatibility with older bash versions)
+compaction_keys=("logical" "smart")
+compaction_values=("USE_NO_COMPACT" "USE_DYNAMIC_COMPACT")
 
 # Project name - replace with your executable name
 executables=("filter_and_join" "compaction")
 
 for name in "${executables[@]}"; do
-    for key in "${!compaction_options[@]}"; do
-        # Build the no_compact version
+    for i in "${!compaction_keys[@]}"; do
+        key="${compaction_keys[$i]}"
+        value="${compaction_values[$i]}"
+        
+        # Build the version
         mkdir -p build-${key}
         cd build-${key}
         # Generate make files with the option enabled
-        cmake -D${compaction_options[$key]}=ON ..
+        cmake -D${value}=ON ..
         # Generate make files with all compaction options off (falls back to no-compact)
         cmake ..
         # Build the project

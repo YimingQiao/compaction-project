@@ -19,6 +19,22 @@ It includes a vectorized execution engine that supports the hash join and the fi
 It implements several compaction strategies, including
  - Logical Compaction
 
+## System Requirements
+
+**C++17 or later** is required, specifically:
+- The code uses `<filesystem>` header which requires C++17
+- On older systems or compilers, you may need to use `<experimental/filesystem>` instead
+- If you encounter compilation errors related to filesystem, try:
+  - For GCC < 8: Link with `-lstdc++fs` and use `#include <experimental/filesystem>`
+  - For older systems: Replace `std::filesystem` with `std::experimental::filesystem`
+
+**Tested on:**
+- GCC 8+ with C++17 support
+- Clang 7+ with C++17 support
+- Modern Linux distributions and macOS
+
+## Building
+
 We provide a compile script that can generate the executable file using the strategies
 
     bash ./build_versions.sh
@@ -37,15 +53,63 @@ The generated executable files are placed in the folder `compaction`.
         --payload-length=[list]   Comma-separated list of payload lengths for RHS   
                                     Example: --payload-length=[0,1000,0,0]
 
+**Note for macOS/zsh users:** If you encounter "no matches found" error, wrap the payload-length value in quotes:
+```bash
+--payload-length="[0,0,0,0]"
+```
+
 ## Example:
 
-    (base) yiming@golf:~/projects/compaction-project$ ./compaction/exe_logical_compaction --join-num 4 --chunk-factor 5 --lhs-size 20000000 --rhs-size 2000000 --load-factor 0.5 --payload-length=[0,0,0,0]
-    ------------------ Setting ------------------
-    Strategy: logical_compaction
-    Number of Joins: 4
-    Number of LHS Tuple: 20000000
+**Linux/bash:**
+```bash
+./compaction/exe_logical_compaction --join-num 4 --chunk-factor 5 --lhs-size 20000000 --rhs-size 2000000 --load-factor 0.5 --payload-length=[0,0,0,0]
+```
+
+**macOS/zsh:**
+```bash
+./compaction/exe_logical_compaction --join-num 4 --chunk-factor 5 --lhs-size 20000000 --rhs-size 2000000 --load-factor 0.5 --payload-length="[0,0,0,0]"
+```
+
+**Cross-platform (recommended):**
+```bash
+./compaction/exe_logical_compaction --join-num 4 --chunk-factor 5 --lhs-size 20000000 --rhs-size 2000000 --load-factor 0.5 --payload-length="[0,0,0,0]"
+```
+
+**Expected output:**
+```
+------------------ Setting ------------------
+Strategy: logical_compaction
+Number of Joins: 4
+Number of LHS Tuple: 20000000
     Number of RHS Tuple: 2000000
     Chunk Factor: 5
+    Load Factor: 0.5
+    RHS Payload Lengths: [0,0,0,0]
+------------------ Statistic ------------------
+[Total Time]: X.XXXXXs
+...
+```
+
+## Troubleshooting
+
+### Filesystem Compilation Issues
+
+If you encounter compilation errors related to `<filesystem>`, try the following:
+
+**For older GCC (< 8.0):**
+```bash
+# Manually link filesystem library
+g++ -std=c++17 -lstdc++fs your_files.cpp
+```
+
+**For older systems that don't support std::filesystem:**
+1. Replace `#include <filesystem>` with `#include <experimental/filesystem>` in:
+   - `profiler.h` 
+   - `negative_feedback.hpp`
+2. Replace `std::filesystem` with `std::experimental::filesystem` in the same files
+3. Link with `-lstdc++fs` for GCC or `-lc++fs` for Clang
+
+**The CMakeLists.txt has been updated to automatically handle this for most cases.**
     Load Factor: 0.5
     RHS Payload Lengths: [0,0,0,0]
     ------------------ Statistic ------------------
