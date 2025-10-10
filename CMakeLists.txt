@@ -5,6 +5,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
 
+# Check if we need to link filesystem library for older compilers
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0")
+    set(FILESYSTEM_LIB stdc++fs)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0")
+    set(FILESYSTEM_LIB c++fs)
+else()
+    set(FILESYSTEM_LIB "")
+endif()
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
@@ -55,3 +64,9 @@ add_executable(filter_and_join
 
 # If you have any libraries, you can link them like this:
 # target_link_libraries(YourProjectName your_library)
+
+# Link filesystem library if needed for older compilers
+if(FILESYSTEM_LIB)
+    target_link_libraries(compaction ${FILESYSTEM_LIB})
+    target_link_libraries(filter_and_join ${FILESYSTEM_LIB})
+endif()

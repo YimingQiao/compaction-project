@@ -4,23 +4,24 @@
 mkdir -p compaction
 mkdir -p filter_and_join
 
-# Dictionary of all compaction options
-declare -A compaction_options=(
-    ["full"]="USE_FULL_COMPACT"
-    ["binary"]="USE_BINARY_COMPACT"
-    ["dynamic"]="USE_DYNAMIC_COMPACT")
+# Compaction options as parallel arrays (for compatibility with older bash versions)
+compaction_keys=("full" "binary" "dynamic")
+compaction_values=("USE_FULL_COMPACT" "USE_BINARY_COMPACT" "USE_DYNAMIC_COMPACT")
 
 # Define project names
 executables=("filter_and_join" "compaction")
 
 # Loop through all compaction options and compile projects
 for name in "${executables[@]}"; do
-    for key in "${!compaction_options[@]}"; do
+    for i in "${!compaction_keys[@]}"; do
+        key="${compaction_keys[$i]}"
+        value="${compaction_values[$i]}"
+        
         # Create a unique build directory for each option
         mkdir -p build-${key}-${name}
         cd build-${key}-${name}
         # Generate make files with the option enabled
-        cmake -D${compaction_options[$key]}=ON ..
+        cmake -D${value}=ON ..
         # Build the project
         make -j96
         # Move the project

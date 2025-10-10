@@ -9,22 +9,23 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <variant>
-#include <iostream>
 #include <cassert>
+#include <iostream>
 #include <list>
+#include <memory>
+#include <sstream>
 #include <unordered_map>
+#include <variant>
+#include <vector>
 
 namespace compaction {
 // Some data structures
-using std::vector;
 using std::list;
 using std::shared_ptr;
+using std::string;
 using std::unique_ptr;
 using std::unordered_map;
-using std::string;
+using std::vector;
 using idx_t = size_t;
 
 extern size_t kBlockSize;
@@ -77,4 +78,4 @@ class DataChunk {
     for (size_t i = 0; i < kBlockSize; ++i) selection_vector_[i] = i;
   };
 };
-}
+}// namespace compaction
